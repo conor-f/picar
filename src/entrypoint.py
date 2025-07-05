@@ -5,6 +5,8 @@
 #   "pydantic",
 #   "requests",
 #   "uvicorn",
+#   "jinja2",
+#   "python-multipart",
 # ]
 # ///
 from api import app

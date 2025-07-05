@@ -5,6 +5,6 @@ RUN python3 -m pip install uv
 
 WORKDIR /app
 
-COPY src/* .
+COPY src/ .
 
 CMD ["uv", "run", "entrypoint.py"]

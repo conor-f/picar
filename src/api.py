@@ -2,10 +2,19 @@ from car_manager import CarManager
 import time
 
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
 
 
 app = FastAPI()
 car_manager = CarManager("192.168.178.61")
+templates = Jinja2Templates(directory="templates")
+
+
+@app.get("/", response_class=HTMLResponse)
+async def homepage(request: Request):
+    return templates.TemplateResponse(request=request, name="index.html")
 
 
 @app.post("/stop")
