@@ -16,5 +16,8 @@ bg_run:
 run_command:
     curl -X POST http://127.0.0.1:8000/drive/1
 
+run_command_live:
+    curl -X POST https://puppy.conor.ooo/drive/1
+
 stop:
     docker ps -a --filter "ancestor=pup.py" -q | xargs -r docker stop
