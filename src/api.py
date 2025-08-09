@@ -4,12 +4,20 @@ import time
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+import os
 from fastapi import Request
 
 
 app = FastAPI()
 car_manager = CarManager("192.168.178.61")
-templates = Jinja2Templates(directory="templates")
+# Create a list of template directories to search
+template_dirs = []
+if os.path.exists("src/templates"):
+    template_dirs.append("src/templates")
+if os.path.exists("templates"):
+    template_dirs.append("templates")
+
+templates = Jinja2Templates(directory=template_dirs)
 
 
 @app.get("/", response_class=HTMLResponse)
