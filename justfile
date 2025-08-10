@@ -5,19 +5,19 @@ list:
     just --list
 
 build:
-    docker build -t pup.py .
+    docker build -t picar .
 
 run:
-    docker run --rm --network host -it pup.py
+    docker run --rm --network host -it picar
 
 bg_run:
-    docker run --rm --network host --detach pup.py
+    docker run --rm --network host --detach picar
 
 run_command:
     curl -X POST http://127.0.0.1:8000/drive/1
 
 run_command_live:
-    curl -X POST https://puppy.conor.ooo/drive/1
+    curl -X POST https://picar.conor.ooo/drive/1
 
 stop:
-    docker ps -a --filter "ancestor=pup.py" -q | xargs -r docker stop
+    docker ps -a --filter "ancestor=picar" -q | xargs -r docker stop

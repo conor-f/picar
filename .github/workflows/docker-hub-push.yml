@@ -23,7 +23,7 @@ jobs:
       - name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=conorjf/pup.py
+          DOCKER_IMAGE=conorjf/picar
           TAGS="${DOCKER_IMAGE}:latest"
 
           if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -55,5 +55,9 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v6
         with:
+          context: .
           push: true
           tags: ${{ steps.prep.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm/v7

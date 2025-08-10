@@ -1,4 +1,4 @@
-# pup.py
+# Picar
 An API controlled car that looks much more like bomb disposal robot than a puppy
 
 
