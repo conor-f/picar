@@ -5,15 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script>
+      // enable HTMX request/response logging in the browser console
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.htmx) { htmx.logAll(); }
+      });
+    </script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
     <div class="bg-white p-8 rounded-lg shadow-md text-center">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome!</h1>
-        <p class="text-gray-600 mb-6">Car Manager Control Panel</p>
-        <div class="space-y-2 text-sm text-gray-500">
-            <p>API endpoints available:</p>
-            <p><code class="bg-gray-100 px-2 py-1 rounded">POST /stop</code> - Stop the car</p>
-            <p><code class="bg-gray-100 px-2 py-1 rounded">POST /drive/{loops}</code> - Drive in loops</p>
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Car Manager</h1>
+
+        <!-- Video Stream -->
+        <img id="video-stream" src="/video" alt="Live video feed"
+             class="w-full max-w-md mx-auto rounded-lg shadow mb-6"/>
+
+        <!-- Control Buttons -->
+        <div class="grid grid-cols-3 gap-2 w-48 mx-auto">
+            <!-- Up -->
+            <button hx-post="/drive" hx-vals='{"direction":"up"}' hx-swap="none"
+                    class="col-span-3 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded">▲</button>
+
+            <!-- Left -->
+            <button hx-post="/drive" hx-vals='{"direction":"left"}' hx-swap="none"
+                    class="bg-blue-500 hover:bg-blue-600 text-white py-2 rounded">◀</button>
+
+            <!-- Stop -->
+            <button hx-post="/stop" hx-swap="none"
+                    class="bg-red-500 hover:bg-red-600 text-white py-2 rounded">■</button>
+
+            <!-- Right -->
+            <button hx-post="/drive" hx-vals='{"direction":"right"}' hx-swap="none"
+                    class="bg-blue-500 hover:bg-blue-600 text-white py-2 rounded">▶</button>
+
+            <!-- Down -->
+            <button hx-post="/drive" hx-vals='{"direction":"down"}' hx-swap="none"
+                    class="col-span-3 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded">▼</button>
         </div>
     </div>
 </body>
