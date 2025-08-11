@@ -1,11 +1,14 @@
 from car_manager import CarManager
-import time
+import asyncio
 
 from fastapi import FastAPI, HTTPException, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import os
 from fastapi import Request
+import cv2
+from starlette.responses import StreamingResponse
+import atexit
 
 
 app = FastAPI()
@@ -27,7 +30,8 @@ async def homepage(request: Request):
 
 @app.post("/stop")
 async def stop_car():
-    return {"status": car_manager.stop()}
+    await car_manager.stop()
+    return {"status": "success"}
 
 
 @app.post("/drive")
@@ -50,7 +54,7 @@ async def drive_direction(direction: str = Form(...)):
         raise HTTPException(status_code=400, detail="Invalid direction")
 
     l_speed, r_speed = mapping[direction]
-    car_manager.drive(l_speed=l_speed, r_speed=r_speed)
+    await car_manager.drive(l_speed=l_speed, r_speed=r_speed)
     return {"status": "driving", "direction": direction}
 
 
@@ -58,13 +62,89 @@ async def drive_direction(direction: str = Form(...)):
 async def drive_car(loops: int):
     try:
         for _ in range(loops):
-            car_manager.drive(l_speed=0.4, r_speed=0.4)
-            time.sleep(0.75)
-            car_manager.stop()
-            car_manager.drive(l_speed=0.4, r_speed=-0.4)
-            time.sleep(0.75)
-            car_manager.stop()
+            await car_manager.drive(l_speed=0.4, r_speed=0.4)
+            await asyncio.sleep(0.75)
+            await car_manager.stop()
+            await car_manager.drive(l_speed=0.4, r_speed=-0.4)
+            await asyncio.sleep(0.75)
+            await car_manager.stop()
 
         return {"status": "success", "loops_completed": loops}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+
+# ------------------------------------------------------------------------------
+# Video streaming (MJPEG) endpoint
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Lazy webcam handling
+# ------------------------------------------------------------------------------
+
+# Will hold the cv2.VideoCapture instance once opened.  None until first /video
+# request so that multiple Uvicorn workers do not all try to grab the camera.
+video_capture: cv2.VideoCapture | None = None
+
+
+def _get_camera() -> cv2.VideoCapture:
+    """
+    Open /dev/video0 the first time we need it and return the singleton handle.
+    Subsequent calls just return the already-opened capture object.
+    """
+    global video_capture
+    if video_capture is None:
+        print("[video] Opening video device /dev/video0 ...")
+        cap = cv2.VideoCapture("/dev/video0")
+        if not cap.isOpened():
+            raise RuntimeError("Could not open video device /dev/video0")
+        print("[video] Video device opened successfully")
+        video_capture = cap
+
+        # Ensure the camera is released exactly once on process exit
+        atexit.register(
+            lambda: (print("[video] Releasing video device"), cap.release())
+        )
+    return video_capture
+
+
+def _mjpeg_generator():
+    """
+    Continuously capture frames from the webcam and yield them as an MJPEG stream.
+    """
+    cap = _get_camera()
+    while True:
+        ok, frame = video_capture.read()
+        if not ok:
+            print("[video] Failed to read frame from camera")
+            continue
+
+        ok, jpg = cv2.imencode(".jpg", frame)
+        if not ok:
+            print("[video] Failed to encode frame as JPEG")
+            continue
+
+        frame_bytes = jpg.tobytes()
+        yield (
+            b"--frame\r\n"
+            b"Content-Type: image/jpeg\r\n"
+            b"Content-Length: "
+            + f"{len(frame_bytes)}".encode()
+            + b"\r\n\r\n"
+            + frame_bytes
+            + b"\r\n"
+        )
+
+
+@app.get("/video")
+async def video_feed():
+    """
+    MJPEG video stream from the webcam.
+    """
+    print("[video] Client connected to /video stream")
+    return StreamingResponse(
+        _mjpeg_generator(),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )
+
+
+# camera release is registered when the camera is first opened in _get_camera()

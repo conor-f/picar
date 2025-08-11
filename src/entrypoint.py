@@ -3,10 +3,11 @@
 # dependencies = [
 #   "fastapi",
 #   "pydantic",
-#   "requests",
+#   "httpx",
 #   "uvicorn",
 #   "jinja2",
 #   "python-multipart",
+#   "opencv-python-headless",
 # ]
 # ///
 from api import app
