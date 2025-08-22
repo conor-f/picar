@@ -1,6 +1,6 @@
 FROM python:3.12-slim-bookworm
 
-RUN apt-get update && apt-get -y install vim
+RUN apt-get update && apt-get -y install vim build-essential
 RUN python3 -m pip install uv
 
 WORKDIR /app
