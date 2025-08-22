@@ -5,7 +5,7 @@ RUN python3 -m pip install uv
 
 WORKDIR /app
 
-RUN uv pip config set global.prefer-binary true
+ENV PIP_PREFER_BINARY=true
 
 # Copy dependency files first for better caching
 COPY pyproject.toml .
