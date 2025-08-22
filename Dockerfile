@@ -10,7 +10,7 @@ COPY pyproject.toml .
 COPY uv.lock* .
 
 # Install dependencies
-RUN uv pip sync --only-binary :all: pyproject.toml
+RUN uv pip sync --system --only-binary :all: pyproject.toml
 
 # Copy source code
 COPY src/ ./src/
