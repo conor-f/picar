@@ -1,15 +1,3 @@
-# /// script
-# requires-python = ">=3.12"
-# dependencies = [
-#   "fastapi",
-#   "pydantic",
-#   "httpx",
-#   "uvicorn",
-#   "jinja2",
-#   "python-multipart",
-#   "opencv-python-headless",
-# ]
-# ///
 from api import app
 import uvicorn
 

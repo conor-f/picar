@@ -5,6 +5,14 @@ RUN python3 -m pip install uv
 
 WORKDIR /app
 
-COPY src/ .
+# Copy dependency files first for better caching
+COPY pyproject.toml .
+COPY uv.lock* .
 
-CMD ["uv", "run", "entrypoint.py"]
+# Install dependencies
+RUN uv sync --frozen
+
+# Copy source code
+COPY src/ ./src/
+
+CMD ["uv", "run", "src/entrypoint.py"]

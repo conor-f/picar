@@ -1,0 +1,18 @@
+[project]
+name = "car-controller"
+version = "0.1.0"
+description = "Car controller web interface"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "pydantic",
+    "httpx",
+    "uvicorn",
+    "jinja2",
+    "python-multipart",
+    "opencv-python-headless",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
