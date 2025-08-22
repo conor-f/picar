@@ -5,14 +5,12 @@ RUN python3 -m pip install uv
 
 WORKDIR /app
 
-ENV PIP_PREFER_BINARY=true
-
 # Copy dependency files first for better caching
 COPY pyproject.toml .
 COPY uv.lock* .
 
 # Install dependencies
-RUN uv sync
+RUN uv sync --only-binary
 
 # Copy source code
 COPY src/ ./src/
